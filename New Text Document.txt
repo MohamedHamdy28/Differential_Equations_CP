@@ -1,0 +1,108 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using WindowsFormsApp1.Methods;
+
+namespace WindowsFormsApp1
+{
+	public partial class Form1 : Form
+	{
+		public Form1()
+		{
+			InitializeComponent();
+		}
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            chart1.Series[0].Enabled = checkBox_Euler.Checked;
+        }
+
+        private void checkBox2_improvedEuler_CheckedChanged(object sender, EventArgs e)
+        {
+            chart1.Series[1].Enabled = checkBox2_improvedEuler.Checked;
+        }
+
+        private void checkbox_RungeKutta_CheckedChanged(object sender, EventArgs e)
+        {
+            chart1.Series[2].Enabled = checkbox_RungeKutta.Checked;
+        }
+
+        private void button_plot_Click(object sender, EventArgs e)
+        {
+            double x0 = 0, y0 = 0, X = 0;
+            int n0 = 0, N = 0;
+            try
+            {
+                x0 = double.Parse(textBox_x0.Text);
+                y0 = double.Parse(textBox_y0.Text);
+                X = double.Parse(textBox_X.Text);
+                n0 = int.Parse(textBox_n0.Text);
+                N = int.Parse(textBox_N.Text);
+                if (n0 <= 0 || N <= 0 || n0 >= N || x0 >= X) throw new Exception();
+            }
+            catch
+            {
+                MessageBox.Show("Invalid input\n");
+                Application.Exit();
+            }
+
+
+            int[] cnt = new int[N - n0 + 1];
+            double[] EE = new double[N - n0 + 1], IEE = new double[N - n0 + 1], RKE = new double[N - n0 + 1];
+            for (int i = n0; i <= N; i++)
+            {
+                cnt[i - n0] = i;
+                Euler tmp1 = new Euler(i, x0, y0, X);
+                ImprovedEuler tmp2 = new ImprovedEuler(i, x0, y0, X);
+                RungeKutta tmp3 = new RungeKutta(i, x0, y0, X);
+
+                EE[i - n0] = tmp1.Calculate();
+                IEE[i - n0] = tmp2.Calculate();
+                RKE[i - n0] = tmp3.Calculate();
+            }
+
+
+            Method exact = new Method(N, x0, y0, X);
+            exact.Calculate();
+            chart1.Series[3].Points.DataBindXY(exact.x, exact.y);
+
+            if (checkBox_Euler.Checked)
+            {
+                Euler m1 = new Euler(N, x0, y0, X);
+                m1.Calculate();
+                chart1.Series[0].Points.DataBindXY(m1.x, m1.y);
+                //chart_lte.Series[0].Points.DataBindXY(m1.x, m1.e);
+                //chart_gte.Series[0].Points.DataBindXY(cnt, EE);
+            }
+            if (checkBox2_improvedEuler.Checked)
+            {
+                ImprovedEuler m2 = new ImprovedEuler(N, x0, y0, X);
+                m2.Calculate();
+                chart1.Series[1].Points.DataBindXY(m2.x, m2.y);
+                //chart_lte.Series[1].Points.DataBindXY(m2.x, m2.e);
+                //chart_gte.Series[1].Points.DataBindXY(cnt, IEE);
+            }
+            if (checkbox_RungeKutta.Checked)
+            {
+                RungeKutta m3 = new RungeKutta(N, x0, y0, X);
+                m3.Calculate();
+                chart1.Series[2].Points.DataBindXY(m3.x, m3.y);
+                //chart_lte.Series[2].Points.DataBindXY(m3.x, m3.e);
+                //chart_gte.Series[2].Points.DataBindXY(cnt, RKE);
+            }
+
+            chart1.ChartAreas[0].AxisX.Minimum = x0;
+            chart1.ChartAreas[0].AxisX.Maximum = X;
+            //chart_lte.ChartAreas[0].AxisX.Minimum = x0;
+            //chart_lte.ChartAreas[0].AxisX.Maximum = X;
+            //chart_gte.ChartAreas[0].AxisX.Minimum = n0;
+            //chart_gte.ChartAreas[0].AxisX.Maximum = N;
+        }
+    }
+}
