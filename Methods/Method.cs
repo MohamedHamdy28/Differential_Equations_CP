@@ -19,14 +19,15 @@ namespace WindowsFormsApp1.Methods
             this.X = X;
             this.x0 = x0;
             this.y0 = y0;
-            if (x0 == 0 || x0 == 1.0 / y0)
+            if (x0 == 0)
             {
                 MessageBox.Show("IVP has no solution");
                 Application.Exit();
             }
-            c = Math.Exp(y0 / -x0)-x0;
-            h = (X - x0) / N;
+            c = Math.Exp(y0 / -x0)-x0; // integration constant value
+            h = (X - x0) / N; // step size
         }
+        // preparing the x,y values of the exact graph
         public void Calculate()
         {
             int range = (int)((X - x0) / 0.01);
@@ -40,6 +41,7 @@ namespace WindowsFormsApp1.Methods
                 count++;
             }
         }
+        // calculating the exact for a point
         protected double Exact(double x)
         {
             if (x == 0.0)

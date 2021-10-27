@@ -18,18 +18,19 @@ namespace WindowsFormsApp1.Methods
             x[0] = x0;
             y[0] = y0;
         }
+        // calculating the values using euler method and the LTE 
         public new double Calculate()
         {
-            double mxe = 0;
+            double mx = 0;
             for (int i = 1; i < N; i++)
             {
                 x[i] = x[i - 1] + h;
                 y[i] = y[i - 1] + h * F(x[i - 1], y[i - 1]);
 
                 e[i] = Math.Abs(y[i] - Exact(x[i]));
-                mxe = Math.Max(mxe, e[i]);
+                mx = Math.Max(mx, e[i]);
             }
-            return mxe;
+            return mx;
         }
     }
 }
